@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #F7F7F7;
+        }
+
+        ul {
+            margin: 0;
+            padding: 50px;
+            list-style: none;
+        }
+
+        .register {
+            width: 800px;
+            margin: 50px auto;
+            background-color: #FFF;
+            border: 1px solid #CCC;
+            border-radius: 5px;
+        }
+
+        li {
+            display: flex;
+            margin: 20px 0;
+        }
+
+        label,
+        input {
+            display: block;
+            float: left;
+            height: 46px;
+            font-size: 24px;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        label {
+            width: 200px;
+            line-height: 46px;
+            margin-right: 30px;
+            text-align: right;
+        }
+
+        input {
+            width: 320px;
+            padding: 8px;
+            line-height: 1;
+            outline: none;
+            position: relative;
+        }
+
+        input.code {
+            width: 120px;
+        }
+
+        input.verify {
+            width: 190px;
+            margin-left: 10px;
+        }
+
+        input.disabled {
+            background-color: #CCC !important;
+        }
+
+        input[type=button],
+        input[type=submit] {
+            border: none;
+            color: #FFF;
+            background-color: #E64145;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .tips {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            height: 40px;
+            text-align: center;
+        }
+
+        .tips p {
+            min-width: 300px;
+            max-width: 400px;
+            line-height: 40px;
+            margin: 0 auto;
+            color: #FFF;
+            display: none;
+            background-color: #C91623;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">hahaJKHK </div>
+    <div class="register">
+        <form id="ajaxForm">
+            <ul>
+                <li>
+                    <label for="">用户名</label>
+                    <input type="text" name="name" class="name">
+                </li>
+                <li>
+                    <label for="">请设置密码</label>
+                    <input type="password" name="pass" class="pass">
+                </li>
+                <li>
+                    <label for="">请确认密码</label>
+                    <input type="password" name="repass" class="repass">
+                </li>
+                <li>
+                    <label for="">验证手机</label>
+                    <input type="text" name="mobile" class="mobile">
+                </li>
+                <li>
+                    <label for="">短信验证码</label>
+                    <input type="text" name="code" class="code">
+                    <input type="button" value="获取验证码" class="verify">
+                </li>
+                <li>
+                    <label for=""></label>
+                    <input type="submit" class="submit " value="立即注册">
+                </li>
+            </ul>
+        </form>
+    </div>
+    <!-- 提示信息 -->
+    <div class="tips">
+        <p>用户名不能为空---</p>
+    </div>
+    <script src="./jquery-1.12.2.js"></script>
+    <script>
+        // // 1、给获取验证码按钮注册事件
+
+        // $('.verify').on('click', function () {
+        //     // 1.8 判断按钮是否是禁用状态  来决定是否发送请求
+        //     if ($(this).hasClass('disabled')) {
+        //         return;   //return 直接跳出当前循环
+        //     }
+        //     // 1.1 获取手机号
+
+        //     var phone = $('.mobile').val();
+
+        //     // 1.3 发送ajax请求
+        //     $.ajax({
+        //         type: 'get',
+        //         url: './sever/getCode.php',
+        //         data: {
+        //             mobile: phone
+        //         },
+        //         beforeSend: function () {
+
+        //             // 1.4 请求发送之前进行校验
+
+        //             if (!(/^(13[0-9]|14[57]|15[0-35-9]|17[0-3]|18[0-35-9])\d{8}$/.test(phone))) {
+        //                 // 1.5 提示用户  delay延迟2s后再消失
+        //                 $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('手机号码不合法');
+        //                 return false;//阻止请求的发送
+        //             }
+
+        //             // 1.6 让按钮有一个禁用的状态
+
+        //             $('.verify').addClass('disabled');
+
+        //             // 1.7 开启定时器  倒数
+        //             var count = 10;
+        //             var timerId = setInterval(function () {
+        //                 count--;
+        //                 $('.verify').val(count + '秒后重新发送')
+
+        //                 // 1.9 清除定时器  让按钮回到原始的状态
+
+        //                 if (count < 0) {
+        //                     clearInterval(timerId);
+        //                     $('.verify').removeClass('disabled').val('获取验证码');
+        //                 }
+        //             }, 1000)
+        //         },
+        //         success: function (res) {
+        //             if (res == '注册成功') {
+        //                 alert(res);
+        //                 $('#ajaxForm').reset();
+        //             }
+        //         }
+
+        //     })
+        // });
+        // // 2 验证用户名
+
+        // // 2.1 给用户名输入框注册失去焦点事件
+        // $('.name').on('blur', function () {
+        //     // 2.2 获取输入框的数据
+        //     var userName = $(this).val();
+        //     // 2.3 发送ajax请求
+        //     $.ajax({
+        //         type: 'get',
+        //         url: './sever/validateUserName.php',
+        //         data: {
+        //             name: userName
+        //         },
+        //         beforeSend: function () {
+        //             // 2.3 判断用户名是否合法
+        //             if (userName.trim() == '') {
+        //                 // 不合法之后的提示
+        //                 $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('用户名不合法');
+        //                 return false;
+        //             }
+        //         },
+        //         dataType: 'json',
+        //         success: function (res) {
+        //             if (res.code == 0) {
+        //                 $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text(res.msg);
+        //             } else {
+        //                 $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text(res.msg);
+        //             }
+        //         },
+        //         error: function () {
+        //             $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('请求失败,请重试')
+        //         }
+        //     })
+        // })
+
+        // 1、验证用户名
+        // 1.1 给用户名输入框注册失焦事件
+
+        // $('.name').on('blur', function () {
+        //     // 1.2 获取输入框内容
+
+        //     var userName = $(this).val();
+        //     // 1.3  发送ajax请求
+        //     $.ajax({
+        //         type: 'get',
+        //         url: './sever/validateUserName.php',
+        //         data: {
+        //             name: userName
+        //         },
+        //         dataType: 'json',
+        //         beforeSend: function () {
+        //             // 1.4 判断用户名是否合法
+        //             if (userName.trim() === '') {
+        //                 //  不合法之后的提示
+        //                 $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('用户名不合法');
+        //                 return false;  //阻止发送请求
+        //             };
+        //         },
+        //         success: function (res) {
+        //             console.log(res)
+
+        //             if (res.code == 0) {
+        //                 $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text(res.msg);
+        //             }
+        //         }
+        //     })
+        // });
+
+        // // 2、验证手机号
+        // // 2.1  给获取验证码按钮注册点击事件
+        // $('.verify').on('click', function () {
+        //     // 判断按钮是否禁用
+        //     if ($(this).hasClass('disabled')) {
+        //         return;
+        //     };
+        //     // 获取号码输入框内容
+        //     var phone = $('.mobile').val();
+        //     // 发送ajax请求
+        //     $.ajax({
+        //         type: 'get',
+        //         url: './sever/getCode.php',
+        //         data: {
+        //             mobile: phone
+        //         },
+        //         beforeSend: function () {
+        //             // 请求发送之前进行校验
+        //             if (!(/^(13[0-9]|14[37]|15[0-35-9]|17[0-3]|18[0-35-9])\d{8}$/.test(phone))) {
+        //                 // 提示用户
+        //                 $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('手机号输入不合法');
+        //                 return false;
+        //             };
+        //             $('.verify').addClass('disabled');
+        //             var count = 10;
+        //             var timerId = setInterval(function () {
+        //                 count--;
+        //                 $('.verify').val(count + '秒后重新获取');
+        //                 if (count < 0) {
+        //                     clearInterval(timerId);
+        //                     $('.verify').removeClass('disabled').val('获取验证码');
+        //                 }
+        //             }, 1000)
+        //         },
+        //         success: function (res) {
+        //             alert(res);
+        //         }
+        //     })
+        // });
+
+
+        // 1、验证用户名是否输入合法
+        // 1.1 获取用户名输入框，注册失焦事件
+        $('.name').on('blur', function () {
+            // 1.2 获取输入框内容
+            var userName = $(this).val();
+            // 1.3 发送ajax请求
+            $.ajax({
+                type: 'get',
+                url: './sever/validateUserName.php',
+                dataType: "json",
+                data: {
+                    name: userName
+                },
+                beforeSend: function () {
+                    if (userName.trim() == '') {
+                        $('.tips p').fadeIn(500).delay(2000).fadeOut(800).text('用户名不合法');
+                        return false;
+                    }
+                },
+                success: function (res) {
+                    if (res.code == 0) {
+                        $('.tips p').fadeIn(500).delay(2000).fadeOut(800).text(res.msg);
+                    } else {
+                        $('.tips p').fadeIn(500).delay(2000).fadeOut(800).text(res.msg);
+                    }
+                }
+            })
+        });
+        // 2、验证手机号输入是否正确
+        // 2.1 获取注册按钮，并给按钮注册点击事件
+        $('.verify').on('click', function () {
+            if ($(this).hasClass('disabled')) {
+                return
+            }
+            // 2.1 获取手机号输入框内容
+            var phone = $('.mobile').val();
+            // 2.2 发送ajax请求
+            $.ajax({
+                type: 'get',
+                url: './sever/getCode.php',
+                data: {
+                    mobile: phone
+                },
+                beforeSend: function () {
+                    // 2.3 判断手机号规则
+                    if (!(/^(13[0-9]|14[37]|15[0-35-9]|17[0-9]|18[0-35-9])\d{8}$/.test(phone))) {
+                        $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('手机号输入不合法');
+                        return false;
+                    }
+                    $('.verify').addClass('disabled');
+                    var count = 10;
+                    var timeId = setInterval(function () {
+                        count--;
+                        $('.verify').val(count + '秒后获取验证码');
+                        if (count < 0) {
+                            clearInterval(timeId);
+                            $('.verify').removeClass('disabled').val('重新获取验证码');
+                        }
+                    }, 1000)
+                },
+                success: function (res) {
+                    alert(res);
+                }
+            })
+        });
+        // 3、完成立即注册
+        // 思路：
+        // 1、给立即注册按钮注册submit事件   注意取消默认行为
+        // 2、获取表单中的输入框的值   可以使用序列化的方式
+        // 3、发送ajax请求
+        // 4、在beforeSend里进行验证  比如两次输入的密码是否一致    有没有输入框中的数据是空的
+        // 5、单机注册按钮之后，注册按钮要变成一个‘正在注册中。。。’的效果
+        // 6、当服务器端有数据响应回来   让注册按钮恢复原状  表单中的额值清空
+
+        // 1、给form表单注册submit事件
+        $('#ajaxForm').on('submit', function (e) {
+            // 阻止请求发送
+            if ($('.submit').hasClass('disabled')) {
+                return;//阻止代码向下执行
+            }
+            // 阻止默认行为   默认提交行为
+            e.preventDefault();
+            // 2.获取form表单中的内容
+            var data = $(this).serialize();
+            //    3、发送ajax请求
+            $.ajax({
+                type: 'post',
+                url: './sever/register.php',
+                data: data,//jQuery中的ajax函数对于提交的数据支持两种格式，一个是对象，一个是拼接好的字符串
+                beforeSend: function () {
+                    // 4. 发送请求之前进行校验
+                    if ($('.pass').val().trim() !== $('.repass').val().trim()) {
+                        $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('两次输入的密码不一致，请重新输入');
+                        // 两次输入的密码不一致 
+                        $('.pass,.repass').val('');
+                    }
+                    // 如果有一项输入框为空，也不能发送请求
+                    var flag = true;
+                    $('input[name]').each(function (index, item) {
+                        if ($(item).val().trim() == '') {
+                            flag = false;
+                        }
+                    });
+                    // 循环完毕之后，要根据flag的值来判断是不是有输入框为空上
+                    if (flag == false) {
+                        $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('输入框不能为空，请重新填写');
+                        return false;//为空就阻止发送请求
+                    };
+                    // 6. 禁用按钮  并更改内容
+                    $('.submit').addClass('disabled').val('正在注册中...');
+                },
+                dataType: 'json',
+                success: function (res) {
+                    if (res.code === 1) {
+                        $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text(res.msg);
+                        // 将表单重置
+                        $('#ajaxForm')[0].reset();
+                    } else {
+                        $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text(res.msg);
+                    }
+                },
+                error: function () {
+                    $('.tips p').fadeIn(500).delay(2000).fadeOut(500).text('请求超时...');
+                },
+                complete: function () {
+                    // 做一些重置的操作  无论成功还是失败都会走complete
+                    // 让按钮恢复原状
+                    $('.submit').removeClass('disabled').val('立即注册')
+                }
+            })
+
+        })
+
+    </script>
+</body>
+
+</html>
